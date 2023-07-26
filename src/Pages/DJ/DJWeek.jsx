@@ -25,16 +25,59 @@ const DJWeek = () => {
     location: "",
     review: "",
   });
+
   const [profileImage, setProfileImage] = useState("");
+  const [addDuration, setAddDuration] = useState("");
+  const [cost, setCost] = useState("");
+  const [location, setLocation] = useState("");
+  const [review, setReview] = useState("");
+
+  const [submitBtnPressed, setSubmitBtnPressed] = useState(false);
+
+  const handleSubmit = () => {
+    const formdata = new FormData();
+    formdata.append("doc", profileImage);
+    formdata.append("addDuration", addDuration);
+    formdata.append("cost", cost);
+    formdata.append("location", location);
+    formdata.append("review", review);
+    setSubmitBtnPressed(true);
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/djOfWeek/create-dj-of-week`,
+        formdata,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        } 
+      )
+      .then((res) => {
+        setSubmitBtnPressed(false);
+        setAddDuration("");
+        setCost("");
+        setLocation("");
+        setReview("");
+        toast({
+          title: "Dj of the week form submited.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      })
+      .catch((err) => {});
+  };
+  const handleUploadImage = (e) => {
+    setProfileImage(e.target.files[0]);
+  };
+
   const djWeeksubmit = (e) => {
     let temp = { ...weeksubmit };
     temp[e.target.name] = e.target.value;
     setWeeksubmit(temp);
   };
-  const handleUploadImage = (e) => {
-    // setProfileImage(e.target.files[0]);
-  };
-  const handleSubmit = () => {
+  const handleSubmit_ = () => {
     try {
       axios
         .post(
@@ -80,7 +123,12 @@ const DJWeek = () => {
                   color={theme === "light" ? "#787878" : "#B9B9B9"}
                   placeholder="Ad Duration"
                   name="addDuration"
-                  onChange={(e) => djWeeksubmit(e)}
+                  onChange={(e) => {
+                    if (e.target.value == "" || !isNaN(e.target.value)) {
+                      setAddDuration(e.target.value);
+                    }
+                  }}
+                  value={addDuration}
                 />
                 <Text
                   fontStyle={"normal"}
@@ -100,7 +148,10 @@ const DJWeek = () => {
                   placeholder="Cost"
                   name="cost"
                   type={"number"}
-                  onChange={(e) => djWeeksubmit(e)}
+                  value={cost}
+                  onChange={(e) => {
+                    setCost(e.target.value);
+                  }}
                 />
                 <Text
                   fontStyle={"normal"}
@@ -127,6 +178,10 @@ const DJWeek = () => {
                   placeholder="Location"
                   name="location"
                   onChange={(e) => djWeeksubmit(e)}
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                  }}
                 />
                 <Text
                   fontStyle={"normal"}
@@ -146,6 +201,10 @@ const DJWeek = () => {
                   placeholder="Display Ad Immediately"
                   name="review"
                   onChange={(e) => djWeeksubmit(e)}
+                  value={review}
+                  onChange={(e) => {
+                    setReview(e.target.value);
+                  }}
                 />
                 <Text
                   fontStyle={"normal"}
@@ -170,7 +229,7 @@ const DJWeek = () => {
                   bgColor={theme === "light" ? "#E0E0E0" : "#181D29"}
                   color={theme === "light" ? "#787878" : "#B9B9B9"}
                   placeholder="Location"
-                  name="location"
+                  name="imageUpload"
                   type="file"
                   style={{ padding: "4px 10px" }}
                   onChange={(e) => handleUploadImage(e)}
@@ -196,8 +255,9 @@ const DJWeek = () => {
               bgColor={"#0086FF"}
               mb={"100px"}
               onClick={handleSubmit}
+              disabled={submitBtnPressed ? true : false}
             >
-              Submit
+              {submitBtnPressed ? "Submit" : "Submit"}
             </Button>
           </Box>
           <Box

@@ -14,3 +14,9 @@
   color: #3a3a3a;
   cursor: pointer;
 }
+.dropdown-dj-usernav {
+  display: flex;
+}
+.name-dd-usernav {
+  margin-left: 10px;
+}

@@ -368,14 +368,15 @@ const UserDjs = () => {
           <Center color={theme === "light" ? "black" : "white"}>
             Loading...
           </Center>
-        ) : djData.length <= 0 && load !== true ? (
+        ) : djData && djData.length <= 0 && load !== true ? (
           <Center color={theme === "light" ? "black" : "white"}>
             No DJ Found
           </Center>
         ) : (
           <>
             <SimpleGrid columns={[1, 1, 2, 3]} gap={"20px"}>
-              {djData.length > 0 &&
+              {djData &&
+                djData.length > 0 &&
                 djData?.map((el, i) => {
                   return (
                     <Box
@@ -409,7 +410,7 @@ const UserDjs = () => {
                               fontSize={"12px"}
                               direction={["column", "row", "row", "row", "row"]}
                             >
-                              {genre.map((elem,i) => {
+                              {genre.map((elem, i) => {
                                 let name = elem;
                                 if (el[name] !== "") {
                                   return <Text key={i}>{el[name]}</Text>;

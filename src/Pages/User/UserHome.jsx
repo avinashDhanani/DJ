@@ -28,7 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RxDotsVertical } from "react-icons/rx";
 import { BsFillCalendarEventFill, BsFillPlayFill } from "react-icons/bs";
 import { AiFillStar } from "react-icons/ai";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { TfiMenuAlt } from "react-icons/tfi";
 import { RiCheckboxMultipleFill } from "react-icons/ri";
 import {
@@ -36,6 +36,7 @@ import {
   getUserDJSearchList,
 } from "../../Redux/AppReducer/Action";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserNearbyDJS = () => {
   const [price, setPrice] = useState(10);
@@ -112,6 +113,18 @@ const UserNearbyDJS = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [arrIsLike, setArrIsLike] = useState([]);
+  useEffect(() => {
+    if (djData) {
+      let tmpLikeData = [];
+      for (let i = 0; i < djData.length; i++) {
+        let currStatus = djData[i].isLike ? true : false;
+        tmpLikeData.push(currStatus);
+      }
+      setArrIsLike(tmpLikeData);
+    }
+  }, [djData]);
+
   const handleSearchDJ = () => {
     const data = {
       pricing: price,
@@ -369,139 +382,24 @@ const UserNearbyDJS = () => {
           <Center color={theme === "light" ? "black" : "white"}>
             Loading...
           </Center>
-        ) : djData.length <= 0 && load !== true ? (
+        ) : (!djData || djData.length <= 0) && load !== true ? (
           <Center color={theme === "light" ? "black" : "white"}>
             No DJ Found
           </Center>
         ) : (
           <>
             <SimpleGrid columns={[1, 1, 2, 3]} gap={"20px"}>
-              {djData.length > 0 &&
+              {djData &&
+                djData.length > 0 &&
                 djData?.map((el, i) => {
                   return (
-                    <Box
-                      color={"white"}
-                      borderRadius={"15px"}
-                      key={i}
-                      p={"10px"}
-                      bgColor={i % 2 === 0 ? "#63D471" : "#B16668"}
-                      // onClick={() => handleSingleDJ(el)}
-                    >
-                      <Flex
-                        gap={"10px"}
-                        direction={[
-                          "column",
-                          "column",
-                          "column",
-                          "column",
-                          "row",
-                        ]}
-                      >
-                        <Image
-                          borderRadius={"15px"}
-                          w={"100px"}
-                          h={"100px"}
-                          src={el.profileImage}
-                        />
-                        <Box textAlign={"left"} w={"full"}>
-                          <Flex justifyContent={"space-between"} gap={"10px"}>
-                            <Flex
-                              gap={"5px"}
-                              fontSize={"12px"}
-                              direction={["column", "row", "row", "row", "row"]}
-                            >
-                              {genre.map((elem, i) => {
-                                let name = elem;
-                                if (el[name] !== "") {
-                                  return <Text key={i}>{el[name]}</Text>;
-                                }
-                              })}
-                            </Flex>
-                            <Box fontSize={"20px"}>
-                              <RxDotsVertical />
-                            </Box>
-                          </Flex>
-                          <Text fontWeight={"bold"} fontSize={"22px"}>
-                            {el.djName || "No Name"}
-                          </Text>
-                          <Flex gap={"5px"} fontSize={"14px"}>
-                            <Center>
-                              <BsFillCalendarEventFill />
-                            </Center>
-                            <Center>
-                              <Text>Until</Text>
-                            </Center>
-                            <Center>
-                              <Text>Apr 26, 2023</Text>
-                            </Center>
-                          </Flex>
-                          <Flex justifyContent={"space-between"}>
-                            <Flex
-                              gap={"10px"}
-                              direction={["column", "row", "row", "row", "row"]}
-                            >
-                              <Center>
-                                {el.avgRating <= 1 ? (
-                                  <Flex>
-                                    <AiFillStar />
-                                  </Flex>
-                                ) : el.avgRating <= 2 ? (
-                                  <Flex>
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                  </Flex>
-                                ) : el.avgRating <= 3 ? (
-                                  <Flex>
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                  </Flex>
-                                ) : el.avgRating <= 4 ? (
-                                  <Flex>
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                  </Flex>
-                                ) : el.avgRating <= 5 ? (
-                                  <Flex>
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                    <AiFillStar />
-                                  </Flex>
-                                ) : null}
-                              </Center>
-                              <Center>
-                                <Text fontSize={"13px"}>
-                                  {el.avgRating} Rating
-                                </Text>
-                              </Center>
-                              <Center>
-                                <AiOutlineHeart style={{ cursor: "hover" }} />
-                              </Center>
-                              <Center>
-                                <Text fontSize={"13px"}>
-                                  {/* {el.avgRating} 108 */}
-                                  108
-                                </Text>
-                              </Center>
-                            </Flex>
-                            <Box
-                              h={"30px"}
-                              p={"7px"}
-                              w={"30px"}
-                              borderRadius={"50%"}
-                              bgColor={"white"}
-                              color={i % 2 === 0 ? "#63D471" : "#B16668"}
-                            >
-                              <BsFillPlayFill />
-                            </Box>
-                          </Flex>
-                        </Box>
-                      </Flex>
-                    </Box>
+                    <DJDataShow
+                      el={el}
+                      i={i}
+                      token={token}
+                      genre={genre}
+                      handleSingleDJ={handleSingleDJ}
+                    />
                   );
                 })}
             </SimpleGrid>
@@ -513,3 +411,165 @@ const UserNearbyDJS = () => {
 };
 
 export default UserNearbyDJS;
+
+const DJDataShow = ({ el, i, token, genre }) => {
+  const [djLiked, setDjLiked] = useState(el.isLike ? true : false);
+  const [djLikedCount, setDjLikedCount] = useState(
+    el.likeCount ? el.likeCount : 0
+  );
+  const onLikeBtnClick = (djId) => {
+    const payload = {
+      djId,
+    };
+    if (djLiked) {
+      axios
+        .post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/like/dislike-dj`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          setDjLiked(false);
+          setDjLikedCount(djLikedCount - 1);
+        })
+        .catch((err) => {});
+    } else {
+      axios
+        .post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/like/like-dj`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          setDjLiked(true);
+          setDjLikedCount(djLikedCount + 1);
+        })
+        .catch((err) => {});
+    }
+  };
+
+  return (
+    <Box
+      color={"white"}
+      borderRadius={"15px"}
+      key={i}
+      p={"10px"}
+      bgColor={i % 2 === 0 ? "#63D471" : "#B16668"}
+      // onClick={() => handleSingleDJ(el)}
+    >
+      <Flex
+        gap={"10px"}
+        direction={["column", "column", "column", "column", "row"]}
+      >
+        <Image
+          borderRadius={"15px"}
+          w={"100px"}
+          h={"100px"}
+          src={el.profileImage}
+        />
+        <Box textAlign={"left"} w={"full"}>
+          <Flex justifyContent={"space-between"} gap={"10px"}>
+            <Flex
+              gap={"5px"}
+              fontSize={"12px"}
+              direction={["column", "row", "row", "row", "row"]}
+            >
+              {genre.map((elem, i) => {
+                let name = elem;
+                if (el[name] !== "") {
+                  return <Text key={i}>{el[name]}</Text>;
+                }
+              })}
+            </Flex>
+            <Box fontSize={"20px"}>
+              <RxDotsVertical />
+            </Box>
+          </Flex>
+          <Text fontWeight={"bold"} fontSize={"22px"}>
+            {el.djName || "No Name"}
+          </Text>
+          <Flex gap={"5px"} fontSize={"14px"}>
+            <Center>
+              <BsFillCalendarEventFill />
+            </Center>
+            <Center>
+              <Text>Until</Text>
+            </Center>
+            <Center>
+              <Text>Apr 26, 2023</Text>
+            </Center>
+          </Flex>
+          <Flex justifyContent={"space-between"}>
+            <Flex
+              gap={"10px"}
+              direction={["column", "row", "row", "row", "row"]}
+            >
+              <Center>
+                {el.avgRating <= 1 ? (
+                  <Flex>
+                    <AiFillStar />
+                  </Flex>
+                ) : el.avgRating <= 2 ? (
+                  <Flex>
+                    <AiFillStar />
+                    <AiFillStar />
+                  </Flex>
+                ) : el.avgRating <= 3 ? (
+                  <Flex>
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                  </Flex>
+                ) : el.avgRating <= 4 ? (
+                  <Flex>
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                  </Flex>
+                ) : el.avgRating <= 5 ? (
+                  <Flex>
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                  </Flex>
+                ) : null}
+              </Center>
+              <Center>
+                <Text fontSize={"13px"}>{el.avgRating} Rating</Text>
+              </Center>
+              <Center onClick={() => onLikeBtnClick(el._id)}>
+                {djLiked ? <AiFillHeart /> : <AiOutlineHeart />}
+              </Center>
+              <Center onClick={() => onLikeBtnClick(el._id)}>
+                <Text fontSize={"13px"}>{djLikedCount}</Text>
+              </Center>
+            </Flex>
+            <Box
+              h={"30px"}
+              p={"7px"}
+              w={"30px"}
+              borderRadius={"50%"}
+              bgColor={"white"}
+              color={i % 2 === 0 ? "#63D471" : "#B16668"}
+            >
+              <BsFillPlayFill />
+            </Box>
+          </Flex>
+        </Box>
+      </Flex>
+    </Box>
+  );
+};
+
+export { DJDataShow };

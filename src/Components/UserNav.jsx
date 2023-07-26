@@ -48,6 +48,8 @@ import {
 } from "../Redux/AppReducer/Action";
 import { logout } from "../Redux/AuthReducer/Action";
 import "./UserNav.css";
+import Form from "react-bootstrap/Form";
+import Dropdown from "react-bootstrap/Dropdown";
 
 const LinkItems = [
   { name: "Home", icon: FiHome, url: "/user" },
@@ -61,6 +63,28 @@ const LinkItems = [
   { name: "Booking Request", icon: GiLaurelsTrophy, url: "" },
   { name: "Dj's", icon: FaHandshake, url: "/user/alldjs" },
   { name: "Favourite", icon: FiSettings, url: "/user/favourites" },
+];
+const dropdownImages = [
+  {
+    img: "/assets/profile/profile.png",
+    name: "Avinash Dhanani",
+    date: "15 February at 02:50 AM",
+  },
+  {
+    img: "/assets/profile/profile.png",
+    name: "Avinash Dhanani",
+    date: "15 February at 02:50 AM",
+  },
+  {
+    img: "/assets/profile/profile.png",
+    name: "Avinash Dhanani",
+    date: "15 February at 02:50 AM",
+  },
+  {
+    img: "/assets/profile/profile.png",
+    name: "Avinash Dhanani",
+    date: "15 February at 02:50 AM",
+  },
 ];
 export function UserNav({ children, tabName }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -301,15 +325,46 @@ const MobileNav = ({ onOpen, tabName, ...rest }) => {
     >
       {tabName == "UserNearbyDJS" && (
         <div>
-          <div
-            className={
-              theme === "light"
-                ? "light-theme-favorites "
-                : "dark-theme-favorites"
-            }
-          >
-            Favorites
-          </div>
+          <Dropdown>
+            <Dropdown.Toggle
+              style={{ width: "250px", border: "none" }}
+              className={
+                theme === "light"
+                  ? "light-theme-favorites "
+                  : "dark-theme-favorites"
+              }
+            >
+              Favorites
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu
+              className={
+                theme === "light"
+                  ? "light-theme-favorites "
+                  : "dark-theme-favorites"
+              }
+            >
+              {dropdownImages.map((dropdownImage) => (
+                <Dropdown.Item
+                  href="#"
+                  style={{ minWidth: "300px" }}
+                  className={
+                    theme == "light"
+                      ? "light-theme-favorites dropdown-dj-usernav"
+                      : "dark-theme-favorites dropdown-dj-usernav"
+                  }
+                >
+                  <div>
+                    <img src={dropdownImage.img} />
+                  </div>
+                  <div className="name-dd-usernav">
+                    <h1 style={{ fontWeight: "20px" }}>{dropdownImage.name}</h1>
+                    <p>{dropdownImage.date}</p>
+                  </div>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
       )}
       <IconButton

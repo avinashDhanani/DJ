@@ -95,7 +95,7 @@ const getUserDJList = (token, toast) => (dispatch) => {
     .then((res) => {
       dispatch({
         type: types.GET_USERDJLIST_SUCCESS,
-        payload: res.data.data.dj,
+        payload: res.data.data.djData,
       });
     })
     .catch((err) => {
@@ -167,9 +167,9 @@ const userSingleDJ = (id, token) => (dispatch) => {
       dispatch({ type: types.SINGLE_DJ, payload: res.data.data.dj });
     });
 };
-const bookingDate=(date)=>(dispatch)=>{
-  dispatch({ type: types.BOOKING_DAY, payload: {date:date} });
-}
+const bookingDate = (date) => (dispatch) => {
+  dispatch({ type: types.BOOKING_DAY, payload: { date: date } });
+};
 export {
   bookingDate,
   getDJMessageList,
