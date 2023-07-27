@@ -50,12 +50,14 @@ import { logout } from "../Redux/AuthReducer/Action";
 import "./UserNav.css";
 import Form from "react-bootstrap/Form";
 import Dropdown from "react-bootstrap/Dropdown";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const LinkItems = [
   { name: "Home", icon: FiHome, url: "/user" },
   { name: "My Dj Bookings", icon: BsPersonPlusFill, url: "/user/book" },
   {
-    name: "Nearby DJs (Map)",
+    name: "Search",
     icon: BsPersonPlusFill,
     url: "/user/mydjbookings",
   },
@@ -198,7 +200,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
               url: "/user/book",
             },
             {
-              name: "Nearby DJs (Map)",
+              name: "Search",
               icon: RiMap2Fill,
               url: "/user/mydjbookings",
             },
@@ -303,11 +305,69 @@ const MobileNav = ({ onOpen, tabName, ...rest }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toast = useToast();
+  const token = useSelector((store) => store.auth.token);
+  const [dataFavorite, setDataFavorite] = useState([]);
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  useEffect(() => {
+    const config = {
+      method: "get",
+      url: `${process.env.REACT_APP_BACKEND_URL}/api/user/user-favourite-dj`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    console.log("avinash dhanani");
+    axios(config)
+      .then(function (response) {
+        if (response?.data?.data?.djData) {
+          console.log(response.data);
+          let tmpData = response.data.data.djData.map((item) => {
+            let date = new Date(item.updatedAt);
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            let strTime = hours + ":" + minutes + " " + ampm;
+            let monthString =
+              date.getDate() +
+              " " +
+              monthNames[date.getMonth()] +
+              " at " +
+              strTime;
+            item.createdAt = monthString;
+            return item;
+          });
+          setDataFavorite(tmpData);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
+  const fetchFavDjs = () => {};
   const handleProfile = () => {
     navigate("/user/profile");
   };
   const user = useSelector((store) => store.auth.user);
   const theme = useSelector((store) => store.app.theme);
+
   return (
     <Flex
       position={"sticky"}
@@ -340,26 +400,45 @@ const MobileNav = ({ onOpen, tabName, ...rest }) => {
             <Dropdown.Menu
               className={
                 theme === "light"
-                  ? "light-theme-favorites "
-                  : "dark-theme-favorites"
+                  ? "light-theme-favorites favorites-dropdown"
+                  : "dark-theme-favorites favorites-dropdown"
               }
+              style={{
+                maxHeight: "500px",
+                overflow: "scroll",
+                overflowX: "hidden",
+              }}
             >
-              {dropdownImages.map((dropdownImage) => (
+              {dataFavorite.map((dropdownImage, index) => (
                 <Dropdown.Item
                   href="#"
-                  style={{ minWidth: "300px" }}
+                  key={index}
+                  style={{
+                    minWidth: "300px",
+                  }}
                   className={
                     theme == "light"
                       ? "light-theme-favorites dropdown-dj-usernav"
                       : "dark-theme-favorites dropdown-dj-usernav"
                   }
                 >
-                  <div>
-                    <img src={dropdownImage.img} />
+                  <div
+                    style={{
+                      width: "50px",
+                      overflow: "hideen",
+                      borderRadius: "50px",
+                    }}
+                  >
+                    <img
+                      src={dropdownImage.djId.profileImage}
+                      style={{ borderRadius: "100px" }}
+                    />
                   </div>
                   <div className="name-dd-usernav">
-                    <h1 style={{ fontWeight: "20px" }}>{dropdownImage.name}</h1>
-                    <p>{dropdownImage.date}</p>
+                    <h1 style={{ fontWeight: "20px" }}>
+                      {dropdownImage.djId.djName + "  "}
+                    </h1>
+                    <p>{dropdownImage.createdAt}</p>
                   </div>
                 </Dropdown.Item>
               ))}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserNav from "../../Components/UserNav";
-import djBanner from "../../Assets/map_image.png";
+import djBanner from "../../Assets/djBanner.png";
 import {
   Box,
   Center,
@@ -36,7 +36,9 @@ import {
   getUserDJSearchList,
 } from "../../Redux/AppReducer/Action";
 import { useNavigate } from "react-router-dom";
+import DjOfTheWeek from "../../Components/DjOfTheWeek/DjOfTheWeek";
 import axios from "axios";
+
 
 const UserNearbyDJS = () => {
   const [price, setPrice] = useState(10);
@@ -356,7 +358,7 @@ const UserNearbyDJS = () => {
       <Box minH={"800px"} p={"20px"}>
         <Box w={"100%"}>
           <Image borderRadius={"15px"} w={"100%"} src={djBanner} />
-        </Box>
+        </Box>  
         <Flex justifyContent={"space-between"} mt={"40px"} mb={"10px"}>
           <Center>
             <Text

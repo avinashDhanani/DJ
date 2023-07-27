@@ -1,0 +1,11 @@
+.djoftheweek-main-div {
+  background-image: "url('/public/assets/images/background.jpg')";
+}
+.sample {
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+}
+.container-slider{
+  display: flex;
+}
